@@ -12,6 +12,10 @@ namespace rage
         char m_padding2[0x758]; // 0xD0
         scrThread* m_script_thread; // 0x828
         bool m_is_script_thread_active; // 0x830
+
+        static tlsContext* get() {
+            return *reinterpret_cast<tlsContext**>(__readgsqword(0x58));
+        }
     };
     static_assert(sizeof(tlsContext) == 0x838);
 }
