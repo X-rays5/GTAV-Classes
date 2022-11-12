@@ -20,6 +20,33 @@ namespace rage
         virtual std::size_t GetSize(void* pointer) const = 0;
         virtual std::size_t GetMemoryUsed(int memoryBucket) = 0;
         virtual std::size_t GetMemoryAvailable() = 0;
+
+    public:
+        static sysMemAllocator* UpdateAllocatorValue()
+        {
+            //B9 ? ? ? ? 48 8B 0C 01 45 33 C9 49 8B D2 48
+            auto g_gtaTlsEntry = *(sysMemAllocator**)(*(uintptr_t*)(__readgsqword(88)) + 0xC8);
+
+            if (g_gtaTlsEntry == nullptr)
+                return nullptr;
+
+            *(sysMemAllocator**)(*(uintptr_t*)(__readgsqword(88)) + 0xC8) = g_gtaTlsEntry;
+            *(sysMemAllocator**)(*(uintptr_t*)(__readgsqword(88)) + 0xC8 - 8) = g_gtaTlsEntry;
+
+            return g_gtaTlsEntry;
+        }
         
     };
+
+    inline sysMemAllocator* GetAllocator()
+    {
+        sysMemAllocator* allocator = *(sysMemAllocator**)(*(uintptr_t*)(__readgsqword(88)) + 0xC8);
+
+        if (!allocator)
+        {
+        return sysMemAllocator::UpdateAllocatorValue();
+        }
+
+        return allocator;
+    }
 }
